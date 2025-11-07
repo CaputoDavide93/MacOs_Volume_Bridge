@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure macOS Audio Bridge",
+        "description": "Enter the connection details for your macOS Audio Bridge",
+        "data": {
+          "host": "Host",
+          "port": "Port"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to macOS Audio Bridge. Please check the host and port.",
+      "unknown": "An unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This macOS Audio Bridge is already configured"
+    }
+  }
+}

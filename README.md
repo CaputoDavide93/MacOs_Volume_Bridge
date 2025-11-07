@@ -201,6 +201,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## ℹ️ About Custom Integration Icons
+
+**Note:** Custom Home Assistant integrations cannot display custom icons in the Home Assistant UI. Integration icons are managed through the official [home-assistant/brands](https://github.com/home-assistant/brands) repository and are only available for core integrations. This integration will display with a generic placeholder icon in the Home Assistant interface.
+
+The icon files included in this repository are used for:
+- GitHub repository branding
+- Documentation and README display
+- macOS application icon
+
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details
