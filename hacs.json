@@ -1,8 +1,6 @@
 {
   "name": "macOS Audio Bridge",
   "content_in_root": false,
-  "filename": "macos_audio_bridge.zip",
   "homeassistant": "2023.8.0",
-  "zip_release": true,
   "render_readme": true
 }
