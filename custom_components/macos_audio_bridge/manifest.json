@@ -1,7 +1,7 @@
 {
   "domain": "macos_audio_bridge",
   "name": "macOS Audio Bridge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "codeowners": ["@CaputoDavide93"],
   "config_flow": true,
   "documentation": "https://github.com/CaputoDavide93/MacOs_Volume_Bridge",
