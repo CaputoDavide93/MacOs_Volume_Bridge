@@ -1,5 +1,9 @@
 # macOS Audio Bridge 🎵
 
+<p align="center">
+  <img src="icon.png" alt="macOS Audio Bridge" width="200"/>
+</p>
+
 A lightweight menu bar app that exposes your Mac's audio controls to Home Assistant via a REST API. Control your Mac's volume and mute status from anywhere in your home automation setup.
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
@@ -14,6 +18,17 @@ A lightweight menu bar app that exposes your Mac's audio controls to Home Assist
 - ⚡ **Lightweight** - Minimal resource usage
 - 🔒 **Privacy First** - All local, no cloud
 - 🎨 **Native UI** - Clean macOS menu bar interface
+
+## 💻 System Requirements
+
+### macOS App
+- **OS**: macOS 13.0 (Ventura) or later
+- **Architecture**: Apple Silicon (ARM64) and Intel (x86_64)
+- **Swift**: 5.9+
+
+### Home Assistant
+- **Version**: 2023.8.0 or later
+- **HACS**: Latest version recommended
 
 ## 🚀 Quick Start
 
@@ -115,39 +130,71 @@ Configure via UI when adding the integration:
 
 - macOS 13.0+
 - Swift 5.9+
-- Home Assistant 2023.8+
+- Xcode Command Line Tools
 
 ### Building from Source
 
 ```bash
-cd /path/to/MacOs_Volume_Bridge
+# Clone the repository
+git clone https://github.com/CaputoDavide93/MacOs_Volume_Bridge.git
+cd MacOs_Volume_Bridge
+
+# Build for your architecture (universal binary)
 swift build -c release
+
+# Install to ~/Applications
 ./install.sh
+
+# Run the app
+open ~/Applications/macOSAudioBridge.app
 ```
 
-### Testing the Integration
+### Architecture Support
 
-```bash
-# Test API connectivity
-curl http://localhost:8888/api/status
+The app is built as a universal binary supporting:
+- **Apple Silicon (ARM64)** - M1, M2, M3 Macs
+- **Intel (x86_64)** - Intel-based Macs
 
-# Run Home Assistant in development mode
-hass --script check_config
-```
+The Swift compiler automatically builds for your current architecture.
 
 ## 📖 API Reference
 
 ### Endpoints
 
-- `GET /api/status` - Get volume, mute status, and capabilities
-- `GET /api/volume` - Get current volume (0-100)
-- `POST /api/volume` - Set volume (0-100)
-- `GET /api/mute` - Get mute status
-- `POST /api/mute` - Set mute status (true/false)
+| Method | Endpoint | Description | Request Body | Response |
+|--------|----------|-------------|--------------|----------|
+| GET | `/api/status` | Get volume, mute status, and capabilities | - | `{"volume": 50, "muted": false, "volume_control_available": true, "mute_control_available": true}` |
+| GET | `/api/volume` | Get current volume (0-100) | - | `{"volume": 50}` |
+| POST | `/api/volume` | Set volume (0-100) | `{"volume": 50}` | `{"success": true, "volume": 50}` |
+| GET | `/api/mute` | Get mute status | - | `{"muted": false}` |
+| POST | `/api/mute` | Set mute status | `{"muted": true}` | `{"success": true, "muted": true}` |
+
+### Example API Calls
+
+```bash
+# Get current status
+curl http://192.168.1.100:8888/api/status
+
+# Set volume to 75%
+curl -X POST http://192.168.1.100:8888/api/volume \
+  -H "Content-Type: application/json" \
+  -d '{"volume": 75}'
+
+# Mute audio
+curl -X POST http://192.168.1.100:8888/api/mute \
+  -H "Content-Type: application/json" \
+  -d '{"muted": true}'
+```
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📄 License
 
