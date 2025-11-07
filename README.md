@@ -1,4 +1,10 @@
-# macOS Audio Bridge 🎵
+<div align="center">
+
+<img src="ICO.png" alt="macOS Audio Bridge" width="200"/>
+
+# macOS Audio Bridge
+
+**Control your Mac's audio from Home Assistant**
 
 A lightweight menu bar app that exposes your Mac's audio controls to Home Assistant via a REST API. Control your Mac's volume and mute status from anywhere in your home automation setup.
 
@@ -9,6 +15,10 @@ A lightweight menu bar app that exposes your Mac's audio controls to Home Assist
 [![Swift](https://img.shields.io/badge/Swift-5.9-orange.svg)](https://swift.org)
 [![Architecture](https://img.shields.io/badge/Architecture-ARM64%20%7C%20x86__64-green.svg)](https://github.com/CaputoDavide93/MacOs_Volume_Bridge)
 [![GitHub Stars](https://img.shields.io/github/stars/CaputoDavide93/MacOs_Volume_Bridge)](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/stargazers)
+
+</div>
+
+---
 
 ## ✨ Features
 
