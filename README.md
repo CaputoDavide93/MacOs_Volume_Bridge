@@ -1,9 +1,5 @@
 # macOS Audio Bridge 🎵
 
-<p align="center">
-  <img src="ICO.png" alt="macOS Audio Bridge" width="200"/>
-</p>
-
 A lightweight menu bar app that exposes your Mac's audio controls to Home Assistant via a REST API. Control your Mac's volume and mute status from anywhere in your home automation setup.
 
 [![GitHub Release](https://img.shields.io/github/v/release/CaputoDavide93/MacOs_Volume_Bridge)](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases)
@@ -39,10 +35,29 @@ A lightweight menu bar app that exposes your Mac's audio controls to Home Assist
 
 ### macOS App Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases)
-2. Extract and move `macOSAudioBridge.app` to your `~/Applications` folder
-3. Launch the app - you'll see a speaker icon in your menu bar
-4. Click the icon to access settings
+#### Option 1: Download PKG Installer (Recommended)
+
+1. Download `macOSAudioBridge-1.0.5.pkg` from [GitHub Releases](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases/latest)
+2. Double-click the PKG file and follow the installation wizard
+3. The app will be installed to `/Applications/macOSAudioBridge.app`
+4. Launch from Applications folder - you'll see a speaker icon in your menu bar
+
+#### Option 2: Build from Source
+
+If you prefer to build the app yourself:
+
+```bash
+git clone https://github.com/CaputoDavide93/MacOs_Volume_Bridge.git
+cd MacOs_Volume_Bridge
+chmod +x install.sh
+./install.sh
+```
+
+After installation (either method):
+
+- Click the menu bar icon to access settings
+- Optionally enable "Launch at Startup"
+- Configure port if needed (default: 8888)
 
 ### Home Assistant Installation
 
