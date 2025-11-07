@@ -6,8 +6,13 @@
 
 A lightweight menu bar app that exposes your Mac's audio controls to Home Assistant via a REST API. Control your Mac's volume and mute status from anywhere in your home automation setup.
 
+[![GitHub Release](https://img.shields.io/github/v/release/CaputoDavide93/MacOs_Volume_Bridge)](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases)
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![macOS](https://img.shields.io/badge/macOS-13.0%2B-blue.svg)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5.9-orange.svg)](https://swift.org)
+[![Architecture](https://img.shields.io/badge/Architecture-ARM64%20%7C%20x86__64-green.svg)](https://github.com/CaputoDavide93/MacOs_Volume_Bridge)
+[![GitHub Stars](https://img.shields.io/github/stars/CaputoDavide93/MacOs_Volume_Bridge)](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/stargazers)
 
 ## ✨ Features
 
