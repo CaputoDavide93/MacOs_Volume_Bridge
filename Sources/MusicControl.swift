@@ -19,9 +19,10 @@ class MusicControl {
         let script = """
         if application "Music" is running then
             tell application "Music"
-                if player state is playing then
+                set currentState to player state as string
+                if currentState contains "playing" then
                     return "playing"
-                else if player state is paused then
+                else if currentState contains "paused" then
                     return "paused"
                 else
                     return "stopped"
@@ -130,16 +131,36 @@ class MusicControl {
         let script = """
         if application "Music" is running then
             tell application "Music"
+                set playerState to player state as string
                 if player state is not stopped then
-                    set trackName to name of current track
-                    set artistName to artist of current track
-                    set albumName to album of current track
-                    set trackDuration to duration of current track
-                    set trackPosition to player position
-                    set playerState to player state as string
+                    try
+                        set trackName to name of current track
+                    on error
+                        set trackName to ""
+                    end try
+                    try
+                        set artistName to artist of current track
+                    on error
+                        set artistName to ""
+                    end try
+                    try
+                        set albumName to album of current track
+                    on error
+                        set albumName to ""
+                    end try
+                    try
+                        set trackDuration to duration of current track
+                    on error
+                        set trackDuration to 0
+                    end try
+                    try
+                        set trackPosition to player position
+                    on error
+                        set trackPosition to 0
+                    end try
                     return trackName & "|" & artistName & "|" & albumName & "|" & trackDuration & "|" & trackPosition & "|" & playerState
                 else
-                    return "|||||stopped"
+                    return "|||||" & playerState
                 end if
             end tell
         else
@@ -148,12 +169,29 @@ class MusicControl {
         """
         
         guard let result = try? executeAppleScript(script) else {
-            return ["is_playing": false, "state": "stopped"]
+            return [
+                "is_playing": false,
+                "state": "idle",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "duration": 0,
+                "position": 0
+            ]
         }
         
         let parts = result.split(separator: "|").map(String.init)
         
-        let state = parts.count > 5 ? parts[5].lowercased() : "stopped"
+        // Map AppleScript state to our state
+        let rawState = parts.count > 5 ? parts[5].lowercased() : "stopped"
+        let state: String
+        if rawState.contains("playing") {
+            state = "playing"
+        } else if rawState.contains("paused") {
+            state = "paused"
+        } else {
+            state = "stopped"
+        }
         
         return [
             "is_playing": state == "playing",

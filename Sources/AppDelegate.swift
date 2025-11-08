@@ -29,6 +29,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupMenu() {
         let menu = NSMenu()
         
+        // Version info (non-clickable header)
+        let version = getVersion()
+        let versionItem = NSMenuItem(title: "macOS Audio Bridge v\(version)", action: nil, keyEquivalent: "")
+        versionItem.isEnabled = false
+        menu.addItem(versionItem)
+        
+        menu.addItem(NSMenuItem.separator())
+        
         // Change Port
         let portItem = NSMenuItem(title: "Change Port...", action: #selector(changePort), keyEquivalent: "")
         portItem.image = NSImage(systemSymbolName: "network", accessibilityDescription: "Change Port")
@@ -51,6 +59,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(quitItem)
         
         statusItem.menu = menu
+    }
+    
+    private func getVersion() -> String {
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            return version
+        }
+        return "1.1.0"
     }
     
     @objc private func changePort() {
