@@ -4,6 +4,7 @@ from typing import Any
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -20,8 +21,8 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the select platform."""
-    host = entry.data["host"]
-    port = entry.data["port"]
+    host = entry.data[CONF_HOST]
+    port = entry.data[CONF_PORT]
     session = async_get_clientsession(hass)
     
     selects = [
