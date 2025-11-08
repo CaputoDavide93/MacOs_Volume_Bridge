@@ -22,12 +22,30 @@ A lightweight menu bar app that exposes your Mac's audio controls to Home Assist
 
 ## ✨ Features
 
+### 🎵 Media Playback Control
+- ▶️ **Play/Pause/Stop** - Full playback control for Music app
+- ⏭️ **Next/Previous Track** - Skip through your playlist
+- 🔀 **Shuffle & Repeat** - Toggle playback modes
+- ⏱️ **Seek** - Jump to any position in a track
+- 📀 **Now Playing Info** - See current track, artist, and album
+
+### 🔊 Audio Management
 - 🎚️ **Volume Control** - Set system volume (0-100%)
 - 🔇 **Mute Control** - Toggle mute state
-- 🏠 **Home Assistant Integration** - Native media_player entity
-- 📡 **Local API** - REST API for direct control
-- ⚡ **Lightweight** - Minimal resource usage
-- 🔒 **Privacy First** - All local, no cloud
+- � **Audio Device Switching** - Change output/input devices
+- 📡 **Device Discovery** - List all available audio devices
+
+### 🏠 Home Assistant Integration
+- 🎮 **Full Media Player Entity** - Native HA media_player with all controls
+- 📊 **Real-time Status** - Volume, mute, playback state, track info
+- � **Easy Setup** - HACS integration with config flow
+- ⚡ **Low Latency** - Local REST API for instant response
+
+### 🔧 Technical Features
+- 📡 **REST API** - Complete HTTP API for automation
+- ⚡ **Lightweight** - Minimal resource usage (~10MB RAM)
+- 🔒 **Privacy First** - 100% local, no cloud services
+- 🍎 **Universal Binary** - Native support for Apple Silicon & Intel
 - 🎨 **Native UI** - Clean macOS menu bar interface
 
 ## 💻 System Requirements

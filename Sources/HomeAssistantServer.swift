@@ -117,30 +117,82 @@ class HomeAssistantServer {
         }
         
         switch (method, path) {
+        // Volume endpoints
         case ("GET", "/api/status"):
             handleGetStatus(connection: connection)
-            
         case ("GET", "/api/volume"):
             handleGetVolume(connection: connection)
-            
         case ("POST", "/api/volume"):
             handleSetVolume(body: body, connection: connection)
-            
         case ("GET", "/api/mute"):
             handleGetMute(connection: connection)
-            
         case ("POST", "/api/mute"):
             handleSetMute(body: body, connection: connection)
+            
+        // Media control endpoints
+        case ("POST", "/api/media/play_pause"):
+            handleMediaPlayPause(connection: connection)
+        case ("POST", "/api/media/play"):
+            handleMediaPlay(connection: connection)
+        case ("POST", "/api/media/pause"):
+            handleMediaPause(connection: connection)
+        case ("POST", "/api/media/stop"):
+            handleMediaStop(connection: connection)
+        case ("POST", "/api/media/next"):
+            handleMediaNext(connection: connection)
+        case ("POST", "/api/media/previous"):
+            handleMediaPrevious(connection: connection)
+        case ("GET", "/api/media/state"):
+            handleGetMediaState(connection: connection)
+        case ("GET", "/api/media/info"):
+            handleGetMediaInfo(connection: connection)
+        case ("POST", "/api/media/seek"):
+            handleMediaSeek(body: body, connection: connection)
+        case ("POST", "/api/media/shuffle"):
+            handleMediaShuffle(connection: connection)
+        case ("POST", "/api/media/repeat"):
+            handleMediaRepeat(connection: connection)
+            
+        // Audio device endpoints
+        case ("GET", "/api/audio/devices"):
+            handleGetAudioDevices(connection: connection)
+        case ("GET", "/api/audio/output"):
+            handleGetOutputDevice(connection: connection)
+        case ("POST", "/api/audio/output"):
+            handleSetOutputDevice(body: body, connection: connection)
+        case ("GET", "/api/audio/input"):
+            handleGetInputDevice(connection: connection)
             
         default:
             sendResponse(connection: connection, status: 404, body: [
                 "error": "Not found",
                 "available_endpoints": [
-                    "GET /api/status",
-                    "GET /api/volume",
-                    "POST /api/volume",
-                    "GET /api/mute",
-                    "POST /api/mute"
+                    "Volume Control": [
+                        "GET /api/status",
+                        "GET /api/volume",
+                        "POST /api/volume",
+                        "GET /api/mute",
+                        "POST /api/mute"
+                    ],
+                    "Media Control": [
+                        "POST /api/media/play_pause",
+                        "POST /api/media/play",
+                        "POST /api/media/pause",
+                        "POST /api/media/stop",
+                        "POST /api/media/next",
+                        "POST /api/media/previous",
+                        "GET /api/media/state",
+                        "GET /api/media/info",
+                        "POST /api/media/seek",
+                        "POST /api/media/shuffle",
+                        "POST /api/media/repeat"
+                    ],
+                    "Audio Devices": [
+                        "GET /api/audio/devices",
+                        "GET /api/audio/output",
+                        "POST /api/audio/output",
+                        "GET /api/audio/input"
+                    ]
                 ]
             ])
         }
@@ -153,11 +205,24 @@ class HomeAssistantServer {
         }
         
         let volumePercent = Int(systemVolume.volume * 100)
+        let mediaInfo = MusicControl.getCurrentTrackInfo()
+        let musicRunning = MusicControl.isMusicRunning()
+        
         let response: [String: Any] = [
             "volume": volumePercent,
             "muted": systemVolume.isMuted,
             "volume_control_available": systemVolume.hasVolumeControl(),
-            "mute_control_available": systemVolume.hasMuteControl()
+            "mute_control_available": systemVolume.hasMuteControl(),
+            "media_control_available": true,
+            "audio_device_control_available": true,
+            "music_app_running": musicRunning,
+            "playback_state": mediaInfo["state"] as? String ?? "stopped",
+            "capabilities": [
+                "volume_control",
+                "mute_control",
+                "media_playback",
+                "audio_device_switching"
+            ]
         ]
         
         sendResponse(connection: connection, status: 200, body: response)
@@ -224,6 +289,220 @@ class HomeAssistantServer {
         sendResponse(connection: connection, status: 200, body: [
             "success": true,
             "muted": muted
+        ])
+    }
+    
+    // MARK: - Media Control Handlers
+    
+    private func handleMediaPlayPause(connection: NWConnection) {
+        do {
+            try MusicControl.playPause()
+            let state = MusicControl.getPlaybackState()
+            sendResponse(connection: connection, status: 200, body: [
+                "success": true,
+                "state": state
+            ])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to toggle playback"])
+        }
+    }
+    
+    private func handleMediaPlay(connection: NWConnection) {
+        do {
+            try MusicControl.play()
+            sendResponse(connection: connection, status: 200, body: [
+                "success": true,
+                "state": "playing"
+            ])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to play"])
+        }
+    }
+    
+    private func handleMediaPause(connection: NWConnection) {
+        do {
+            try MusicControl.pause()
+            sendResponse(connection: connection, status: 200, body: [
+                "success": true,
+                "state": "paused"
+            ])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to pause"])
+        }
+    }
+    
+    private func handleMediaStop(connection: NWConnection) {
+        do {
+            try MusicControl.stop()
+            sendResponse(connection: connection, status: 200, body: [
+                "success": true,
+                "state": "stopped"
+            ])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to stop"])
+        }
+    }
+    
+    private func handleMediaNext(connection: NWConnection) {
+        do {
+            try MusicControl.nextTrack()
+            sendResponse(connection: connection, status: 200, body: ["success": true])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to skip to next track"])
+        }
+    }
+    
+    private func handleMediaPrevious(connection: NWConnection) {
+        do {
+            try MusicControl.previousTrack()
+            sendResponse(connection: connection, status: 200, body: ["success": true])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to skip to previous track"])
+        }
+    }
+    
+    private func handleGetMediaState(connection: NWConnection) {
+        let state = MusicControl.getPlaybackState()
+        let isRunning = MusicControl.isMusicRunning()
+        sendResponse(connection: connection, status: 200, body: [
+            "state": state,
+            "is_running": isRunning
+        ])
+    }
+    
+    private func handleGetMediaInfo(connection: NWConnection) {
+        let info = MusicControl.getCurrentTrackInfo()
+        sendResponse(connection: connection, status: 200, body: info)
+    }
+    
+    private func handleMediaSeek(body: [String: Any]?, connection: NWConnection) {
+        guard let body = body,
+              let position = body["position"] as? Int else {
+            sendResponse(connection: connection, status: 400, body: [
+                "error": "Invalid position",
+                "required": "position (seconds)"
+            ])
+            return
+        }
+        
+        do {
+            try MusicControl.seek(to: position)
+            sendResponse(connection: connection, status: 200, body: [
+                "success": true,
+                "position": position
+            ])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to seek"])
+        }
+    }
+    
+    private func handleMediaShuffle(connection: NWConnection) {
+        do {
+            try MusicControl.toggleShuffle()
+            let shuffleState = MusicControl.getShuffleState()
+            sendResponse(connection: connection, status: 200, body: [
+                "success": true,
+                "shuffle": shuffleState
+            ])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to toggle shuffle"])
+        }
+    }
+    
+    private func handleMediaRepeat(connection: NWConnection) {
+        do {
+            try MusicControl.toggleRepeat()
+            let repeatMode = MusicControl.getRepeatMode()
+            sendResponse(connection: connection, status: 200, body: [
+                "success": true,
+                "repeat": repeatMode
+            ])
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to toggle repeat"])
+        }
+    }
+    
+    // MARK: - Audio Device Handlers
+    
+    private func handleGetAudioDevices(connection: NWConnection) {
+        let devices = AudioDevices.getAllDevices()
+        let deviceList = devices.map { device in
+            return [
+                "id": device.id,
+                "name": device.name,
+                "uid": device.uid,
+                "is_input": device.isInput,
+                "is_output": device.isOutput
+            ] as [String: Any]
+        }
+        
+        sendResponse(connection: connection, status: 200, body: [
+            "devices": deviceList,
+            "count": devices.count
+        ])
+    }
+    
+    private func handleGetOutputDevice(connection: NWConnection) {
+        guard let device = AudioDevices.getCurrentOutputDevice() else {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to get output device"])
+            return
+        }
+        
+        sendResponse(connection: connection, status: 200, body: [
+            "id": device.id,
+            "name": device.name,
+            "uid": device.uid
+        ])
+    }
+    
+    private func handleSetOutputDevice(body: [String: Any]?, connection: NWConnection) {
+        guard let body = body else {
+            sendResponse(connection: connection, status: 400, body: [
+                "error": "Missing body",
+                "required": "name or id"
+            ])
+            return
+        }
+        
+        do {
+            if let deviceID = body["id"] as? UInt32 {
+                try AudioDevices.setOutputDevice(deviceID: deviceID)
+            } else if let name = body["name"] as? String {
+                try AudioDevices.setOutputDevice(name: name)
+            } else {
+                sendResponse(connection: connection, status: 400, body: [
+                    "error": "Invalid parameters",
+                    "required": "name (string) or id (number)"
+                ])
+                return
+            }
+            
+            if let newDevice = AudioDevices.getCurrentOutputDevice() {
+                sendResponse(connection: connection, status: 200, body: [
+                    "success": true,
+                    "device": [
+                        "id": newDevice.id,
+                        "name": newDevice.name
+                    ]
+                ])
+            } else {
+                sendResponse(connection: connection, status: 200, body: ["success": true])
+            }
+        } catch {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to set output device"])
+        }
+    }
+    
+    private func handleGetInputDevice(connection: NWConnection) {
+        guard let device = AudioDevices.getCurrentInputDevice() else {
+            sendResponse(connection: connection, status: 500, body: ["error": "Failed to get input device"])
+            return
+        }
+        
+        sendResponse(connection: connection, status: 200, body: [
+            "id": device.id,
+            "name": device.name,
+            "uid": device.uid
         ])
     }
     
