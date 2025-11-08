@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Post-install script - Verify installation and optionally launch
+
+echo "Installation complete!"
+echo "macOS Audio Bridge has been installed to /Applications/macOSAudioBridge.app"
+
+# Make sure the app is executable
+chmod +x "/Applications/macOSAudioBridge.app/Contents/MacOS/macOSAudioBridge"
+
+# Optional: Launch the app after installation
+# Uncomment the line below if you want auto-launch after install
+# open "/Applications/macOSAudioBridge.app"
+
+exit 0

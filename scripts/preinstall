@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Pre-install script - Quit the running app before installation
+
+echo "Checking for running macOS Audio Bridge..."
+
+# Kill the app if it's running
+pkill -x macOSAudioBridge
+
+# Wait a moment for the app to quit
+sleep 1
+
+# Check if app exists and remove it to ensure clean install
+if [ -d "/Applications/macOSAudioBridge.app" ]; then
+    echo "Removing existing installation..."
+    rm -rf "/Applications/macOSAudioBridge.app"
+fi
+
+echo "Ready for installation"
+exit 0
