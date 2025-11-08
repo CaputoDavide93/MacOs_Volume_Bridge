@@ -6,6 +6,7 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import aiohttp
 
 from . import DOMAIN
@@ -21,10 +22,11 @@ async def async_setup_entry(
     """Set up the select platform."""
     host = entry.data["host"]
     port = entry.data["port"]
+    session = async_get_clientsession(hass)
     
     selects = [
-        MacOSAudioBridgeOutputDeviceSelect(host, port),
-        MacOSAudioBridgeInputDeviceSelect(host, port),
+        MacOSAudioBridgeOutputDeviceSelect(host, port, session),
+        MacOSAudioBridgeInputDeviceSelect(host, port, session),
     ]
     
     async_add_entities(selects, True)
@@ -33,16 +35,18 @@ async def async_setup_entry(
 class MacOSAudioBridgeSelectBase(SelectEntity):
     """Base class for macOS Audio Bridge selects."""
 
-    def __init__(self, host: str, port: int, select_type: str, name: str, icon: str):
+    def __init__(self, host: str, port: int, session, select_type: str, name: str, icon: str):
         """Initialize the select."""
         self._host = host
         self._port = port
+        self._session = session
         self._select_type = select_type
         self._attr_name = f"macOS Audio Bridge {name}"
         self._attr_unique_id = f"macos_audio_bridge_{select_type}"
         self._attr_icon = icon
         self._attr_options = []
         self._attr_current_option = None
+        self._attr_available = True
 
     @property
     def device_info(self):
@@ -58,32 +62,39 @@ class MacOSAudioBridgeSelectBase(SelectEntity):
         """Fetch data from the API."""
         url = f"http://{self._host}:{self._port}{endpoint}"
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as response:
-                    if response.status == 200:
-                        return await response.json()
+            async with self._session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    self._attr_available = True
+                    return await response.json()
+                else:
+                    self._attr_available = False
         except Exception as err:
-            _LOGGER.debug("Error fetching data from %s: %s", url, err)
+            _LOGGER.error("Error fetching data from %s: %s", url, err)
+            self._attr_available = False
         return None
 
     async def _post_data(self, endpoint: str, data: dict[str, Any] | None = None) -> bool:
         """Post data to the API."""
         url = f"http://{self._host}:{self._port}{endpoint}"
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=data, timeout=aiohttp.ClientTimeout(total=5)) as response:
-                    return response.status == 200
+            async with self._session.post(url, json=data, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    self._attr_available = True
+                    return True
+                else:
+                    self._attr_available = False
         except Exception as err:
             _LOGGER.error("Error posting data to %s: %s", url, err)
+            self._attr_available = False
         return False
 
 
 class MacOSAudioBridgeOutputDeviceSelect(MacOSAudioBridgeSelectBase):
     """Select for output audio device."""
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, session):
         """Initialize the select."""
-        super().__init__(host, port, "output_device_select", "Output Device", "mdi:speaker")
+        super().__init__(host, port, session, "output_device_select", "Output Device", "mdi:speaker")
 
     async def async_update(self) -> None:
         """Update the select options and current value."""
@@ -111,9 +122,9 @@ class MacOSAudioBridgeOutputDeviceSelect(MacOSAudioBridgeSelectBase):
 class MacOSAudioBridgeInputDeviceSelect(MacOSAudioBridgeSelectBase):
     """Select for input audio device."""
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, session):
         """Initialize the select."""
-        super().__init__(host, port, "input_device_select", "Input Device", "mdi:microphone")
+        super().__init__(host, port, session, "input_device_select", "Input Device", "mdi:microphone")
 
     async def async_update(self) -> None:
         """Update the select options and current value."""

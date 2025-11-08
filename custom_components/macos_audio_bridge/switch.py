@@ -6,6 +6,7 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import aiohttp
 
 from . import DOMAIN
@@ -21,10 +22,11 @@ async def async_setup_entry(
     """Set up the switch platform."""
     host = entry.data["host"]
     port = entry.data["port"]
+    session = async_get_clientsession(hass)
     
     switches = [
-        MacOSAudioBridgeShuffleSwitch(host, port),
-        MacOSAudioBridgeRepeatSwitch(host, port),
+        MacOSAudioBridgeShuffleSwitch(host, port, session),
+        MacOSAudioBridgeRepeatSwitch(host, port, session),
     ]
     
     async_add_entities(switches, True)
@@ -33,15 +35,17 @@ async def async_setup_entry(
 class MacOSAudioBridgeSwitchBase(SwitchEntity):
     """Base class for macOS Audio Bridge switches."""
 
-    def __init__(self, host: str, port: int, switch_type: str, name: str, icon: str):
+    def __init__(self, host: str, port: int, session, switch_type: str, name: str, icon: str):
         """Initialize the switch."""
         self._host = host
         self._port = port
+        self._session = session
         self._switch_type = switch_type
         self._attr_name = f"macOS Audio Bridge {name}"
         self._attr_unique_id = f"macos_audio_bridge_{switch_type}"
         self._attr_icon = icon
         self._attr_is_on = False
+        self._attr_available = True
 
     @property
     def device_info(self):
@@ -57,32 +61,39 @@ class MacOSAudioBridgeSwitchBase(SwitchEntity):
         """Fetch data from the API."""
         url = f"http://{self._host}:{self._port}{endpoint}"
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as response:
-                    if response.status == 200:
-                        return await response.json()
+            async with self._session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    self._attr_available = True
+                    return await response.json()
+                else:
+                    self._attr_available = False
         except Exception as err:
-            _LOGGER.debug("Error fetching data from %s: %s", url, err)
+            _LOGGER.error("Error fetching data from %s: %s", url, err)
+            self._attr_available = False
         return None
 
     async def _post_data(self, endpoint: str, data: dict[str, Any] | None = None) -> bool:
         """Post data to the API."""
         url = f"http://{self._host}:{self._port}{endpoint}"
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=data, timeout=aiohttp.ClientTimeout(total=5)) as response:
-                    return response.status == 200
+            async with self._session.post(url, json=data, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    self._attr_available = True
+                    return True
+                else:
+                    self._attr_available = False
         except Exception as err:
             _LOGGER.error("Error posting data to %s: %s", url, err)
+            self._attr_available = False
         return False
 
 
 class MacOSAudioBridgeShuffleSwitch(MacOSAudioBridgeSwitchBase):
     """Switch for shuffle mode."""
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, session):
         """Initialize the switch."""
-        super().__init__(host, port, "shuffle", "Shuffle", "mdi:shuffle")
+        super().__init__(host, port, session, "shuffle", "Shuffle", "mdi:shuffle")
 
     async def async_update(self) -> None:
         """Update the switch state."""
@@ -106,9 +117,9 @@ class MacOSAudioBridgeShuffleSwitch(MacOSAudioBridgeSwitchBase):
 class MacOSAudioBridgeRepeatSwitch(MacOSAudioBridgeSwitchBase):
     """Switch for repeat mode."""
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, session):
         """Initialize the switch."""
-        super().__init__(host, port, "repeat", "Repeat", "mdi:repeat")
+        super().__init__(host, port, session, "repeat", "Repeat", "mdi:repeat")
 
     async def async_update(self) -> None:
         """Update the switch state."""
