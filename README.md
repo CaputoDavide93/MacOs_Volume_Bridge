@@ -25,20 +25,15 @@ A lightweight menu bar app that exposes your Mac's audio controls to Home Assist
 ### 🎵 Media Playback Control
 - ▶️ **Play/Pause/Stop** - Full playback control for Music app
 - ⏭️ **Next/Previous Track** - Skip through your playlist
-- 🔀 **Shuffle & Repeat** - Toggle playback modes
-- ⏱️ **Seek** - Jump to any position in a track
-- 📀 **Now Playing Info** - See current track, artist, and album
 
 ### 🔊 Audio Management
 - 🎚️ **Volume Control** - Set system volume (0-100%)
 - 🔇 **Mute Control** - Toggle mute state
-- � **Audio Device Switching** - Change output/input devices
-- 📡 **Device Discovery** - List all available audio devices
 
 ### 🏠 Home Assistant Integration
-- 🎮 **Full Media Player Entity** - Native HA media_player with all controls
-- 📊 **Real-time Status** - Volume, mute, playback state, track info
-- � **Easy Setup** - HACS integration with config flow
+- 🎮 **Simple Media Player Entity** - Native HA media_player with essential controls
+- 📊 **Real-time Status** - Volume, mute, and playback state
+- 🔧 **Easy Setup** - HACS integration with config flow
 - ⚡ **Low Latency** - Local REST API for instant response
 
 ### 🔧 Technical Features
@@ -65,7 +60,7 @@ A lightweight menu bar app that exposes your Mac's audio controls to Home Assist
 
 #### Option 1: Download PKG Installer (Recommended)
 
-1. Download `macOSAudioBridge-1.0.5.pkg` from [GitHub Releases](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases/latest)
+1. Download `macOSAudioBridge-1.3.0.pkg` from [GitHub Releases](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases/latest)
 2. Double-click the PKG file and follow the installation wizard
 3. The app will be installed to `/Applications/macOSAudioBridge.app`
 4. Launch from Applications folder - you'll see a speaker icon in your menu bar
