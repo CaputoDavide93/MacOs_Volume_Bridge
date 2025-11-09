@@ -227,7 +227,7 @@ class AudioDevices {
             return nil
         }
         
-        var name: Unmanaged<CFString>?
+        let name: Unmanaged<CFString>? = nil
         var unmanagedName = name
         propertySize = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
         
@@ -264,7 +264,7 @@ class AudioDevices {
             return nil
         }
         
-        var uid: Unmanaged<CFString>?
+        let uid: Unmanaged<CFString>? = nil
         var unmanagedUID = uid
         propertySize = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
         
