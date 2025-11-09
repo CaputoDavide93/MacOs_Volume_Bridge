@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "macos_audio_bridge"
-PLATFORMS = [Platform.MEDIA_PLAYER, Platform.SENSOR, Platform.SWITCH, Platform.SELECT]
+PLATFORMS = [Platform.MEDIA_PLAYER]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up macOS Audio Bridge from a config entry."""
