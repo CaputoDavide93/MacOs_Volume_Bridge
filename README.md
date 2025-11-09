@@ -60,7 +60,7 @@ A lightweight menu bar app that exposes your Mac's audio controls to Home Assist
 
 #### Option 1: Download PKG Installer (Recommended)
 
-1. Download `macOSAudioBridge-1.3.0.pkg` from [GitHub Releases](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases/latest)
+1. Download `macOSAudioBridge-1.3.1.pkg` from [GitHub Releases](https://github.com/CaputoDavide93/MacOs_Volume_Bridge/releases/latest)
 2. Double-click the PKG file and follow the installation wizard
 3. The app will be installed to `/Applications/macOSAudioBridge.app`
 4. Launch from Applications folder - you'll see a speaker icon in your menu bar
