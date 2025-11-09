@@ -39,7 +39,8 @@ class MusicControl {
     // Play/Pause toggle
     static func playPause() throws {
         guard isMusicRunning() else {
-            throw MusicError.musicNotRunning
+            // If Music is not running, don't launch it - just return success
+            return
         }
         
         let script = """
@@ -52,7 +53,8 @@ class MusicControl {
     // Play
     static func play() throws {
         guard isMusicRunning() else {
-            throw MusicError.musicNotRunning
+            // If Music is not running, don't launch it - just return success
+            return
         }
         
         let script = """
@@ -65,7 +67,8 @@ class MusicControl {
     // Pause
     static func pause() throws {
         guard isMusicRunning() else {
-            throw MusicError.musicNotRunning
+            // If Music is not running, just return success (nothing to pause)
+            return
         }
         
         let script = """
@@ -78,7 +81,8 @@ class MusicControl {
     // Stop
     static func stop() throws {
         guard isMusicRunning() else {
-            throw MusicError.musicNotRunning
+            // If Music is not running, just return success (nothing to stop)
+            return
         }
         
         let script = """

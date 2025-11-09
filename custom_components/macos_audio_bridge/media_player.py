@@ -110,20 +110,26 @@ class MacOSAudioBridgeMediaPlayer(MediaPlayerEntity):
                     self._volume = data.get("volume", 50) / 100.0
                     self._muted = data.get("muted", False)
                     
-                    playback_state = data.get("playback_state", "idle")
+                    playback_state = data.get("playback_state", "idle").lower()
                     if playback_state == "playing":
                         self._state = MediaPlayerState.PLAYING
                     elif playback_state == "paused":
                         self._state = MediaPlayerState.PAUSED
+                    elif playback_state == "stopped":
+                        self._state = MediaPlayerState.IDLE
                     else:
                         self._state = MediaPlayerState.IDLE
                     
                     self._available = True
                 else:
+                    _LOGGER.warning("API returned status %d for %s", response.status, url)
                     self._available = False
                     
+        except aiohttp.ClientError as err:
+            _LOGGER.warning("Connection error to macOS Audio Bridge at %s:%s: %s", self._host, self._port, err)
+            self._available = False
         except Exception as err:
-            _LOGGER.debug("Error updating macOS Audio Bridge: %s", err)
+            _LOGGER.error("Unexpected error updating macOS Audio Bridge: %s", err, exc_info=True)
             self._available = False
 
     async def async_set_volume_level(self, volume):
@@ -140,9 +146,12 @@ class MacOSAudioBridgeMediaPlayer(MediaPlayerEntity):
             ) as response:
                 if response.status == 200:
                     self._volume = volume
+                else:
+                    _LOGGER.warning("Failed to set volume: HTTP %d", response.status)
                     
         except Exception as err:
             _LOGGER.error("Error setting volume: %s", err)
+            # Don't mark unavailable on command errors - only on update errors
 
     async def async_mute_volume(self, mute):
         """Mute or unmute the volume."""
@@ -157,9 +166,12 @@ class MacOSAudioBridgeMediaPlayer(MediaPlayerEntity):
             ) as response:
                 if response.status == 200:
                     self._muted = mute
+                else:
+                    _LOGGER.warning("Failed to mute/unmute: HTTP %d", response.status)
                     
         except Exception as err:
             _LOGGER.error("Error muting volume: %s", err)
+            # Don't mark unavailable on command errors
 
     async def async_media_play(self):
         """Send play command."""
